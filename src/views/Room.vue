@@ -104,13 +104,10 @@ export default {
   mounted() {
     let rooms = db.ref(`rooms/${localStorage.getItem("roomId")}`);
     rooms.on("value", snapshot => {
-      console.log(snapshot.val());
+      // console.log(snapshot.val());
       this.player1 = snapshot.val().player1;
       this.player2 = snapshot.val().player2;
       this.name = snapshot.val().name;
-      if (snapshot.val().chat) {
-        this.chat.unshift(snapshot.val().chat);
-      }
       if (
         snapshot.val().player1.status == true &&
         snapshot.val().player2.status == true
@@ -123,6 +120,15 @@ export default {
         this.$router.push("/gameboard");
       }
     });
+
+    db
+      .ref(`rooms/${localStorage.getItem("roomId")}/chat`)
+      .on('value', snapshot => {
+        console.log(snapshot.val())
+          if (snapshot.val()) {
+        this.chat.unshift(snapshot.val());
+      }
+      })
 
     db
       .ref(`rooms/${localStorage.getItem("roomId")}`)
