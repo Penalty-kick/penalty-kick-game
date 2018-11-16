@@ -13,6 +13,9 @@
                 </h1>
         </div>
         <RoomList v-bind:playerName="playerName"> </RoomList>
+        <div id="toTop" @click="topFunction()">
+            Back to Top
+        </div>
     </div>
     <div class="container" v-else>
         <div id="login-row" class="row justify-content-center align-items-center">
@@ -46,8 +49,12 @@ export default {
     };
   },
   methods: {
+    topFunction: function () {
+      document.getElementById('content').scrollIntoView();  
+    },
     login: function() {
       this.playerName = this.playerInput
+      localStorage.setItem('player', this.playerInput)   
     }
   },
 };
@@ -63,6 +70,13 @@ export default {
     background-size: cover;
     background-position: center;
     color: #F3E5AB;
+}
+#toTop {
+    background-color: #71BC78
+}
+#toTop:hover {
+    cursor: pointer;
+    color: white
 }
 
 /* Animations
