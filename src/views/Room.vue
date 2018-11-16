@@ -61,12 +61,16 @@ export default {
       name: '',
       player1: "",
       player2: "",
-      isReady: false,
-      chat: []
+      isReady: false
     };
   },
   methods: {
     startGame(){
+      db
+        .ref(`rooms/${localStorage.getItem("roomId")}`)
+        .update({
+          status: 'onGame'
+        })
       this.$router.push('/gameboard')
     },
     readyFunct(input) {
@@ -96,19 +100,11 @@ export default {
         let starting = document.getElementById('starting')
         starting.play()
       }
+      
+      if (snapshot.val().status == 'onGame'){
+        this.$router.push('/gameboard')
+      }
     });
-
-
-    db
-      .ref(`rooms/${localStorage.getItem("roomId")}`).once('value')
-      .then(data => {
-        console.log(data.val())
-        if (data.val().player2.name === undefined){
-          localStorage.setItem('user', data.val().player1.name)
-        } else {
-          localStorage.setItem('user', data.val().player2.name)
-        }
-      })
   }
 };
 </script>

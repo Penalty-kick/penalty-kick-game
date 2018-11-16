@@ -87,6 +87,7 @@ export default {
     joinRoom: function(id) {
       db.ref(`rooms/${id}/player2/name`).set(this.playerName, snapshot => {
         this.error_status = false
+        localStorage.setItem('roomId', id)
         this.$router.push("room");
       });
     }
