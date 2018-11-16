@@ -1,8 +1,8 @@
 <template>
     <div id="mainContainer">
         <div id="contentContainer" class="container-fluid" >
-            <div class="row">
-                <div class="col-12" id="gameDisini">
+            <div>
+                <div class="col" id="gameDisini">
                     
                     <div :class="ballClass">
                         <img style="z-index: 10; possition: absolute;" src="ball.png" alt=""> 
@@ -31,9 +31,15 @@
                     </div>
 
                     <div id="inputKey">
-                        {{inputKeyUp}}
+                        <span v-if="inputKeyUp != 'Out'" class="bg-info"> 
+                            {{inputKeyUp}}
+
+                        </span>
                         <br>
+                        <span class="bg-danger">
                         {{statusAs}}
+
+                        </span>
                     </div>
 
                     <div id="rlt" class="p-2"> 
@@ -139,43 +145,20 @@ export default {
             let player2Move = data.val().player2
             let match = this.turnIndex -1
 
-
-            if(match %2 != 0) {
-                if(player1Move) {
-                    this.ballClass = String(player1Move).toLowerCase() + ' absolut'
-                    this.keeperClass = String(player2Move).toLowerCase()
-                }
-                if(player1Move != player2Move) {
-                    db.ref(`rooms/${this.roomId}/eachMatchResultWinner/${match}`).set(this.player1.playerId)
-                } else {
-                    db.ref(`rooms/${this.roomId}/eachMatchResultWinner/${match}`).set(this.player2.playerId)
-                }
+            if(player1Move) {
+                this.keeperClass = String(player1Move).toLowerCase()
+                this.ballClass = String(player2Move).toLowerCase() + ' absolut'
+            }
+            if(player1Move != player2Move) {
+                db.ref(`rooms/${this.roomId}/eachMatchResultWinner/${match}`).set(this.player2.playerId)
             } else {
-                if(player1Move) {
-                    this.ballClass = String(player2Move).toLowerCase() + ' absolut'
-                    this.keeperClass = String(player1Move).toLowerCase()
-                }
-                if(player1Move != player2Move) {
-                    db.ref(`rooms/${this.roomId}/eachMatchResultWinner/${match}`).set(this.player2.playerId)
-                } else {
-                    db.ref(`rooms/${this.roomId}/eachMatchResultWinner/${match}`).set(this.player1.playerId)
-                }
-            }         
+                db.ref(`rooms/${this.roomId}/eachMatchResultWinner/${match}`).set(this.player1.playerId)
+            }
 
         });
 
     },
     methods: {
-
-        calculateEachMatch() {
-            // db.ref(`rooms/` + this.roomId).once('value', snapshot => {
-                // if(snapshot.val().turnIndex %2 == 0 ) {
-                    // console.log(snapshot.val().player1.moveValues);
-                    // console.log(snapshot.val().player1.moveValues[snapshot.val().turnIndex]);
-                    // console.log(snapshot.val().player2.moveValues[snapshot.val().turnIndex]);
-                // }
-            // })
-        },
 
         initGame() {
             let roomId = this.roomId
@@ -190,15 +173,13 @@ export default {
         initGameEngine() {
             let playerId = this.playerId
             let roomId = this.roomId
-
             // db.ref(`rooms/` + roomId + `/${playerId}`).once('value', () => {
             db.ref(`rooms/` + roomId + `/turnIndex`).set(0)
-            db.ref(`rooms/` + roomId + `/turnCountdown`).set(5)
+            db.ref(`rooms/` + roomId + `/turnCountdown`).set(8)
             db.ref(`rooms/` + roomId + `/eachMatchResult`).set({})
             db.ref(`rooms/` + roomId + `/${playerId}/moveValues`).set([0,0,0,0,0,0,0])
             db.ref(`rooms/` + roomId + `/eachMatchResultWinner`).set([])
             // })
-
         },
 
         
@@ -210,15 +191,10 @@ export default {
             let machresultref = db.ref(`rooms/${this.roomId}/eachMatchResult/${this.turnIndex}/${this.playerId}`)
             machresultref.set(this.inputKeyUp)
 
-  
-           
-
             let turnIndexAddOne = this.turnIndex + 1
             db.ref(`rooms/` + this.roomId + `/turnIndex`).set(turnIndexAddOne)
-            db.ref(`rooms/` + this.roomId + `/turnCountdown`).set(5)
+            db.ref(`rooms/` + this.roomId + `/turnCountdown`).set(8)
             this.inputKeyUp = 'Out'
-            this.calculateEachMatch()
-
  
         },
 
@@ -245,22 +221,20 @@ export default {
         }
     },
     watch: {
+        
         turnCountdown : function(newVal) {
             if(newVal == 0 ) {
                 this.excecuteInputKey()
             }
         },
+
         turnIndex :  function(newVal) {
            
-            
             if(newVal == 8) {
                 let roomId = localStorage.getItem('roomId')
                 db.ref(`rooms/` + roomId + `/turnIndex`).set(0)
             } 
         },
-        // eachMatchResult : function(newVal) {
-        //     console.log(newVal);
-        // }
    
     }
 }
@@ -284,21 +258,21 @@ export default {
     #gameDisini {
         display: grid;
         height: 600px;
-        width: 1000px;
+        width: 1300px;
         background-image: url('/goalpostLayout.jpg');
         background-repeat: no-repeat;
-        background-size: 1350px 600px;
+        background-size: 1300px 600px;
         grid-template-areas: 
-            "sta rlt rlt rlt rlt rlt rlt cd"
-            "sta . . . Up . . out"
-            ". Left . B B . Right ."
-            ". . . B B . . ."
-            ". . . . Down . . ."
-            ". . . . . . . ."
-            ". . . . . . . inputKey"
-            ". . . A A . scr scr";
-        grid-template-columns: repeat(8, 1fr);
-        grid-template-rows: repeat(8, 1fr);
+            "sta sta rlt rlt rlt rlt rlt rlt cd ."
+            "sta sta . . . Up . . out ."
+            ". . Left . . . . Right . ."
+            ". . . . B Down . . . ."
+            ". . . . . . . . . ."
+            ". . . . . . . . . ."
+            ". . . . . . . . inputKey inputKey"
+            ". . A . . . . scr scr scr";
+        grid-template-columns: repeat(10, 120px);
+        grid-template-rows: repeat(8, 72px);
     }
     .absolut {
         position: absolute;
