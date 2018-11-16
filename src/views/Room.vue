@@ -37,6 +37,15 @@
         </div>
       </div>
 
+      <div style="margin-top: 40px">
+  <form action="">
+    <h4 class="roomTitle" style="font-size: 50px; color: white">Chatbox</h4>
+    <input v-model="inputChat" type="text">
+    <button class="btn bg-dark" @click="chatSubmit"> SEND </button>
+    <h5 class="roomTitle" style="font-size: 20px; color: white" v-if="chat.length<5" v-for="(element,index) in chat" :key="index">{{element.name}} : {{element.val}}</h5>
+    <h5 class="roomTitle" style="font-size: 20px; color: white" v-if="chat.length>=5" v-for="(element,index) in chat.slice(0,4)" :key="index">{{element.name}} : {{element.val}}</h5>
+  </form>
+      </div>
   </div>
       <audio id="ready" >
         <source src="../assets/ready.mp3" type="audio/mpeg">
@@ -58,24 +67,30 @@ import { functions } from "firebase";
 export default {
   data() {
     return {
-      name: '',
+      name: "",
       player1: "",
       player2: "",
-      isReady: false
+      inputChat: "",
+      isReady: false,
+      chat: []
     };
   },
   methods: {
-    startGame(){
-      db
-        .ref(`rooms/${localStorage.getItem("roomId")}`)
-        .update({
-          status: 'onGame'
-        })
-      this.$router.push('/gameboard')
+    chatSubmit(e) {
+      e.preventDefault();
+      db.ref(`rooms/${localStorage.getItem("roomId")}`).update({
+        chat: { val: this.inputChat, name: localStorage.getItem("user") }
+      });
+    },
+    startGame() {
+      db.ref(`rooms/${localStorage.getItem("roomId")}`).update({
+        status: "onGame"
+      });
+      this.$router.push("/gameboard");
     },
     readyFunct(input) {
-      let ready = document.getElementById('ready')
-      ready.play()
+      let ready = document.getElementById("ready");
+      ready.play();
       db.ref(`rooms/${localStorage.getItem("roomId")}/${input}`).update({
         status: true
       });
@@ -86,78 +101,97 @@ export default {
       });
     }
   },
-  computed: {
-    ...mapState(["name"])
-  },
   mounted() {
     let rooms = db.ref(`rooms/${localStorage.getItem("roomId")}`);
     rooms.on("value", snapshot => {
       console.log(snapshot.val());
       this.player1 = snapshot.val().player1;
       this.player2 = snapshot.val().player2;
-      this.name =snapshot.val().name
-      if( snapshot.val().player1.status == true && snapshot.val().player2.status == true){
-        let starting = document.getElementById('starting')
-        starting.play()
+      this.name = snapshot.val().name;
+      if (snapshot.val().chat) {
+        this.chat.unshift(snapshot.val().chat);
       }
-      
-      if (snapshot.val().status == 'onGame'){
-        this.$router.push('/gameboard')
+      if (
+        snapshot.val().player1.status == true &&
+        snapshot.val().player2.status == true
+      ) {
+        let starting = document.getElementById("starting");
+        starting.play();
+      }
+
+      if (snapshot.val().status == "onGame") {
+        this.$router.push("/gameboard");
       }
     });
+
+    db
+      .ref(`rooms/${localStorage.getItem("roomId")}`)
+      .once("value", snapshot => {
+        if (snapshot.val().player2.name == undefined) {
+          localStorage.setItem("user", snapshot.val().player1.name);
+        } else {
+          localStorage.setItem("user", snapshot.val().player2.name);
+        }
+      });
   }
 };
 </script>
 
 <style scoped>
 @font-face {
-  font-family: 'Bangers';
+  font-family: "Bangers";
   font-style: normal;
   font-weight: 400;
-  src: local('Bangers Regular'), local('Bangers-Regular'), url(https://fonts.gstatic.com/s/bangers/v10/FeVQS0BTqb0h60ACH55Q2A.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: local("Bangers Regular"), local("Bangers-Regular"),
+    url(https://fonts.gstatic.com/s/bangers/v10/FeVQS0BTqb0h60ACH55Q2A.woff2)
+      format("woff2");
+  unicode-range: U + 0000-00ff, U + 0131, U + 0152-0153, U + 02bb-02bc, U + 02c6,
+    U + 02da, U + 02dc, U + 2000-206f, U + 2074, U + 20ac, U + 2122, U + 2191,
+    U + 2193, U + 2212, U + 2215, U + FEFF, U + FFFD;
 }
 /* latin */
 @font-face {
-  font-family: 'Luckiest Guy';
+  font-family: "Luckiest Guy";
   font-style: normal;
   font-weight: 400;
-  src: local('Luckiest Guy Regular'), local('LuckiestGuy-Regular'), url(https://fonts.gstatic.com/s/luckiestguy/v8/_gP_1RrxsjcxVyin9l9n_j2hTd52.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: local("Luckiest Guy Regular"), local("LuckiestGuy-Regular"),
+    url(https://fonts.gstatic.com/s/luckiestguy/v8/_gP_1RrxsjcxVyin9l9n_j2hTd52.woff2)
+      format("woff2");
+  unicode-range: U + 0000-00ff, U + 0131, U + 0152-0153, U + 02bb-02bc, U + 02c6,
+    U + 02da, U + 02dc, U + 2000-206f, U + 2074, U + 20ac, U + 2122, U + 2191,
+    U + 2193, U + 2212, U + 2215, U + FEFF, U + FFFD;
 }
 
 .roomTitle {
-  font-family: 'Bangers';
-  font-size: 100px
+  font-family: "Bangers";
+  font-size: 100px;
 }
 
-.sameFont{
- font-family: 'Luckiest Guy';
- position:relative; 
- top: 50%; 
- font-size: 150px;
- color: rgb(65, 179, 40)
- }
+.sameFont {
+  font-family: "Luckiest Guy";
+  position: relative;
+  top: 50%;
+  font-size: 150px;
+  color: rgb(65, 179, 40);
+}
 
-
-.bgRoom{
+.bgRoom {
   min-height: 900px;
-  background-image: url('../assets/bgRoom.jpg');
+  background-image: url("../assets/bgRoom.jpg");
   background-size: cover;
-  background-repeat:no-repeat;
-  background-position: center
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 /*Button Two*/
 .button-two {
   border-radius: 4px;
-  background-color:#d35400;
+  background-color: #d35400;
   border: none;
   padding: 20px;
   width: 200px;
   transition: all 0.5s;
 }
-
 
 .button-two span {
   cursor: pointer;
@@ -167,7 +201,7 @@ export default {
 }
 
 .button-two span:after {
-  content: '»';
+  content: "»";
   position: absolute;
   opacity: 0;
   top: 0;
@@ -183,5 +217,4 @@ export default {
   opacity: 1;
   right: 0;
 }
-
 </style>
