@@ -86,6 +86,7 @@ export default {
           .then(snapshot => {
             localStorage.setItem('roomId', snapshot.key)
             this.error_status = false
+            localStorage.setItem('playerId', 'player1')
             this.$router.push("room");
           })
           .catch(err => {
@@ -99,6 +100,7 @@ export default {
       db.ref(`rooms/${id}/player2/name`).set(this.playerName, snapshot => {
         this.error_status = false
         localStorage.setItem('roomId', id)
+        localStorage.setItem('playerId', 'player2')
         this.$router.push("room");
       });
     }
