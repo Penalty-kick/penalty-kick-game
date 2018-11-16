@@ -1,5 +1,4 @@
 <template>
-<<<<<<< HEAD
 <div class="bgRoom">
   <div class="container">
     <div class="row d-flex justify-content-center ">
@@ -190,7 +189,3 @@ export default {
 }
 
 </style>
-=======
- <h1>Room</h1>
-</template>
->>>>>>> Added lobby
