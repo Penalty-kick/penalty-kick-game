@@ -3,47 +3,55 @@
         <Error v-if="error_status" v-bind:error="error_msg"/>
         <div class="header">
                 <h2>Room List</h2>
-                <div class="form-row">
-                    <input v-model="roomName" class="form-control form-control-sm col-2" type="text" placeholder="Room Name">
-                    <button @click.prevent="createRoom()" class="btn btn-sm btn-success col-2">Create Room</button>
-                </div>
+                  <div class="row">
+                    <div class="form-row col-6">
+                        <input v-model="roomName" class="form-control form-control-sm col-8" type="text" placeholder="Room Name">
+                        <button @click.prevent="createRoom()" class="btn btn-sm btn-success col-4">Create Room</button>
+                    </div>
+                    <div class="col-6" style="display:flex; justify-content:flex-end">
+                      <button @click="chat()" type="button" class="btn btn-sm btn-danger">Chat</button>
+                    </div>
+                  </div>
                 <div class="separator"> </div>
         </div>
         <div class="row soccerbg">
-          <div class="col-3" v-for="(room, index) in roomList" :key="index" style="background-color: #dfffa9">
-              <div class="roomName">
-                  {{room.name}}
-              </div>
-              <div class="roomMaster">
-                  Room Master: {{room.player1.name}}
-              </div>
-              <br>
-              <div class="roomInfo row">
-                  <div class="col" v-if="!room.player2 || !room.player2.name">
-                    <img src="../assets/player.svg" alt="" style="width:25px"> 1
+              <div class="col-3" v-for="(room, index) in roomList" :key="index" style="background-color: #dfffa9">
+                  <div class="roomName">
+                      {{room.name}}
                   </div>
-                  <div class="col" v-else>
-                      <img src="../assets/player.svg" alt="" style="width:25px"> 2
+                  <div class="roomMaster">
+                      Room Master: {{room.player1.name}}
                   </div>
-              </div>
-              <br>
-              <div class="roomJoin">
-                  <button v-if="!room.player2 || !room.player2.name" @click.prevent="joinRoom(room.roomId)" class="btn btn-sm btn-success">Join Room</button>
-                  <button disabled v-else class="btn btn-sm btn-danger">Room Full</button>
-              </div>                
-          </div>
-      </div>
+                  <br>
+                  <div class="roomInfo row">
+                      <div class="col" v-if="!room.player2 || !room.player2.name">
+                        <img src="../assets/player.svg" alt="" style="width:25px"> 1
+                      </div>
+                      <div class="col" v-else>
+                          <img src="../assets/player.svg" alt="" style="width:25px"> 2
+                      </div>
+                  </div>
+                  <br>
+                  <div class="roomJoin">
+                      <button v-if="!room.player2 || !room.player2.name" @click.prevent="joinRoom(room.roomId)" class="btn btn-sm btn-success">Join Room</button>
+                      <button disabled v-else class="btn btn-sm btn-danger">Room Full</button>
+                  </div>                
+              </div>          
+        </div>
+        <Chat id="chat"> </Chat>
     </div>
 </template>
 
 <script>
+import Chat from "@/components/Chat.vue";
 import Error from "@/components/Error.vue";
 import db from "../assets/config.js";
 import { functions } from "firebase";
 
 export default {
   components: {
-    Error
+    Error,
+    Chat
   },
   props: ["playerName"],
   data() {
@@ -55,6 +63,9 @@ export default {
     };
   },
   methods: {
+    chat: function() {
+      document.getElementById('chat').scrollIntoView();
+    },
     createRoom: function() {
       if (!this.roomName) {
           this.error_msg = "Room Name cannot be Empty"
