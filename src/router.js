@@ -28,5 +28,10 @@ export default new Router({
       name: 'gameboard',
       component: () => import('./views/Gameboard.vue')
     },
+    {
+      path: '/chat',
+      name: 'chat',
+      component: () => import('./views/ChatRoom.vue')
+    }
   ]
 })
