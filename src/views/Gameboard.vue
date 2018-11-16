@@ -51,6 +51,10 @@
                         </span>
                     </div>
 
+                    <audio id="cdAudio">  
+                        <source src="../assets/8SecondCountdown.mp3" type="audio/mpeg">
+                    </audio>
+
                 </div>
             </div>
         </div>
@@ -203,6 +207,10 @@ export default {
         },
 
         countItDown() {
+            // let audio = document.getElementById('cdAudio')
+            // let audio = new Audio('../assets/8SecondCountdown.mp3');
+            // audio.play();
+           
 
             let interval = setInterval(() => {
                 if (this.turnCountdown > 0)  {
@@ -214,7 +222,11 @@ export default {
             db.ref(`rooms/` + this.roomId + '/turnIndex').on('value', snapshot => {
                 if(snapshot.val() == 7) {
                     clearInterval(interval);
+                  
                 }
+
+                cdAudio.play()
+                cdAudio.currentTime=1
             })
 
             
