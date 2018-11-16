@@ -11,9 +11,9 @@
                         <img style="z-index: 8; possition: absolute;" src="goalkeeper.png" alt=""> 
                     </div>
                     
-                    <!-- <div class="ballInit"> 
-                        <img src="ball.png" alt=""> 
-                    </div> -->
+                    <div v-if="resultMessage" class="resultDisplay">
+                        {{resultMessage}}
+                    </div>
 
                     <div id="sta">
                         <br>
@@ -70,6 +70,7 @@ import db from "../assets/config";
 export default {
     data () {
         return {
+            resultMessage : '',
 
             ballClass : 'ballInit',
             keeperClass : 'keeperInit',
@@ -106,11 +107,6 @@ export default {
         this.initGame()
     },
     computed : {
-        // winner() {
-        //     if(this.eachMatchResult[this.turnIndex] ) {
-        //         return this.eachMatchResult[this.turnIndex]
-        //     }
-        // }
         statusAs() {
             if(this.playerId == 'player1') {
                 return 'keeper'
@@ -207,10 +203,6 @@ export default {
         },
 
         countItDown() {
-            // let audio = document.getElementById('cdAudio')
-            // let audio = new Audio('../assets/8SecondCountdown.mp3');
-            // audio.play();
-           
 
             let interval = setInterval(() => {
                 if (this.turnCountdown > 0)  {
@@ -222,7 +214,37 @@ export default {
             db.ref(`rooms/` + this.roomId + '/turnIndex').on('value', snapshot => {
                 if(snapshot.val() == 7) {
                     clearInterval(interval);
-                  
+
+                    let arrayOfResult = this.eachMatchResultWinner
+
+                    let player1 = 0
+                    let player2 = 0
+
+                    arrayOfResult.forEach(res => {
+                        if(res == 'player1') {
+                            player1 += 1
+                        } else {
+                            player2 += 1
+                        }
+                    })
+
+                    if(player1 > player2 ) {
+                        if(this.playerId == 'player1') {
+                            this.resultMessage = 'YOU WIN'
+                            console.log('You Win');
+                        } else {
+                            this.resultMessage = 'YOU LOSE'
+                            console.log('You Lose');
+                        }
+                    } else {
+                        if(this.playerId == 'player2') {
+                            this.resultMessage = 'YOU WIN'
+                            console.log('You Win');
+                        } else {
+                            this.resultMessage = 'YOU LOSE'
+                            console.log('You Lose');
+                        }
+                    }
                 }
 
                 cdAudio.play()
@@ -253,6 +275,24 @@ export default {
 </script>
 
 <style>
+
+    .resultDisplay {
+        width: 700px;
+        height: 400px;
+        background-color: cadetblue;
+        position: absolute;
+        top : 100px;
+        left: 20%;
+        margin: 0 auto;
+        display: grid;
+        justify-content: center;
+        align-content: center;
+        border-radius: 20px;
+        z-index: 100;
+        box-shadow: 0 0 0 20px gray;
+        font-size: 90px;
+        transition: .5s;
+    }
 
     #mainContainer {
         /* background-image: url('/goalpostLayout.jpg'); */
